@@ -19,15 +19,13 @@ class CreateProjectsTable extends Migration
             $table->string('title');
             $table->text('description');
             $table->timestamps();
+            
            
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
+ 
+
     public function down()
     {
         Schema::dropIfExists('projects');

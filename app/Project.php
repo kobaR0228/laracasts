@@ -3,6 +3,7 @@
 namespace App;
 
 
+
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
@@ -13,16 +14,16 @@ class Project extends Model
     public function tasks(){
         return $this->hasMany(Task::class);
     }
-    
   
-    public function addTask($task)
+    public function addTask($attributes)
     {
-        
-        
-            //Task::create([
-            //'project_id'=> $this->id,
-            //'description'=> $attributes
-            //]);
+         $this->tasks()->create($attributes);
+         
+        // return  Task::create([
+        // 'project_id' => $this->id,
+        //  'description' => $attributes
+        //  ]);
+          
         
     }
 }
