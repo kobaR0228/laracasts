@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Project;
-use App\Services\Twitter;
-use App\Mail\ProjectCreated;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Mail;
+// use App\Mail\ProjectCreated;
+use App\Events\ProjectCreated;
+// use Illuminate\Filesystem\Filesystem;
 
 class ProjectController extends Controller
 
@@ -52,9 +50,10 @@ class ProjectController extends Controller
         
         $project->save(); */
         
-        Mail::to($project->owner->email)->send(
-            new ProjectCreated($project)
-            );
+        // Mail::to($project->owner->email)->send(
+        //     new ProjectCreated($project)
+        // );
+        event(new ProjectCreated($project));
         
         return redirect('/projects');
         
