@@ -7,6 +7,7 @@ use App\Project;
 use App\Services\Twitter;
 use App\Mail\ProjectCreated;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Mail;
 
 class ProjectController extends Controller
 
@@ -18,12 +19,12 @@ class ProjectController extends Controller
     public function index()
     {
 
+        //$projects=auth()->user()->projects;
+        //$projects = Project::where('owner_id', auth()->id())->get();
         
-        $projects = Project::where('owner_id', auth()->id())->get();
+       
         
-        dump($projects);
-        
-        return view('projects.index',['projects'=>$projects]);        
+        return view('projects.index',['projects'=>auth()->user()->projects]);        
     }
     public function create(){
         
@@ -31,13 +32,15 @@ class ProjectController extends Controller
         return view('projects.create');        
     }
     public function store(){
-       $attributes = request()->validate([
-            'title'=> ['required', 'min:3', 'max:20'],
-            'description' => ['required', 'min:3', 'max:200']
-            ]);
-            
-            $attributes['owner_id']= auth()->id();
-         Project::create($attributes);
+       
+    //   $attributes = request()->validate([
+    //         'title'=> ['required', 'min:3', 'max:20'],
+    //         'description' => ['required', 'min:3', 'max:200']
+    //         ]);
+        
+        $attributes = $this->validateProject();   
+        $attributes['owner_id']= auth()->id();
+        $project = Project::create($attributes);
         /*Project::create([
             'title' => request('title'),
             'description' => request('description')
@@ -49,8 +52,9 @@ class ProjectController extends Controller
         
         $project->save(); */
         
-        \Mail::to('kob.ryusei0228@gmail.com')->send(
-            new ProjectCreated)
+        Mail::to($project->owner->email)->send(
+            new ProjectCreated($project)
+            );
         
         return redirect('/projects');
         
@@ -68,11 +72,14 @@ class ProjectController extends Controller
     }
     public function edit(Project $project){
        
+       
         return view('projects.edit',['project'=>$project]);
     }
     public function update(Project $project){
+       
+ 
         
-       $project->update(request(['title', 'description']));
+       $project->update(request($this->validateProject()));
        /*
        $project->title =request('title');
        $project->description =request('description');
@@ -87,6 +94,13 @@ class ProjectController extends Controller
         //$project = Project::findOrFail($id);
         $project->delete();
         return redirect('/projects');
+    }
+    protected function validateProject()
+    {
+           return  $attributes = request()->validate([
+            'title'=> ['required', 'min:3', 'max:20'],
+            'description' => ['required', 'min:3', 'max:200']
+            ]);   
     }
     
     

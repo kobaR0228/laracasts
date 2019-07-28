@@ -23,8 +23,10 @@ class Project extends Model
         // 'project_id' => $this->id,
         //  'description' => $attributes
         //  ]);
-          
-        
+    }
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
     }
 }
 
