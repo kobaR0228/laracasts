@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Project;
 use App\Services\Twitter;
+use App\Mail\ProjectCreated;
 use Illuminate\Filesystem\Filesystem;
 
 class ProjectController extends Controller
@@ -19,6 +20,8 @@ class ProjectController extends Controller
 
         
         $projects = Project::where('owner_id', auth()->id())->get();
+        
+        dump($projects);
         
         return view('projects.index',['projects'=>$projects]);        
     }
@@ -46,6 +49,9 @@ class ProjectController extends Controller
         
         $project->save(); */
         
+        \Mail::to('kob.ryusei0228@gmail.com')->send(
+            new ProjectCreated)
+        
         return redirect('/projects');
         
         //return request()->all(); POSTしたものをリクエストできる
@@ -53,8 +59,9 @@ class ProjectController extends Controller
     }
     public function show(Project $project)
     {
+      $this->authorize('update', $project);
       
-      abort_if($project->owner_id !== auth()->id(), 403);
+      //abort_if($project->owner_id !== auth()->id(), 403);
         return view('projects.show', ['project'=>$project]);
         //return view('projects.show',['project'=>$project]);
         
